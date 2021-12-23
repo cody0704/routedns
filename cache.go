@@ -128,6 +128,16 @@ func (r *Cache) Resolve(q *dns.Msg, ci ClientInfo) (*dns.Msg, error) {
 		return a, nil
 	}
 
+	// Strip option records that are nil - TODO: remove this
+	edns0 := a.IsEdns0()
+	if edns0 != nil {
+		for i, opt := range edns0.Option {
+			if opt == nil {
+				edns0.Option = append(edns0.Option[:i], edns0.Option[i+1:]...)
+			}
+		}
+	}
+
 	// Put the upstream response into the cache and return it. Need to store
 	// a copy since other elements might modify the response, like the replacer.
 	r.storeInCache(q, a.Copy())
