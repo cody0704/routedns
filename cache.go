@@ -122,6 +122,7 @@ func (r *Cache) Resolve(q *dns.Msg, ci ClientInfo) (*dns.Msg, error) {
 	if err != nil || a == nil {
 		return nil, err
 	}
+	alertNilEDNS0Opt(a, "p1")
 
 	// Don't cache truncated responses
 	if a.Truncated {

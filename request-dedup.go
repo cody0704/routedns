@@ -106,6 +106,9 @@ func (r *requestDedup) Resolve(q *dns.Msg, ci ClientInfo) (*dns.Msg, error) {
 
 	// Not already in flight, make the request
 	a, err := r.resolver.Resolve(q, ci)
+
+	alertNilEDNS0Opt(a, "p2")
+
 	req.answer = a
 	req.err = err
 	close(req.done) // release other goroutines waiting for the response
