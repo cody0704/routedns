@@ -158,6 +158,8 @@ func (r *Cache) answerFromCache(q *dns.Msg) (*dns.Msg, bool) {
 		if r.ShuffleAnswerFunc != nil {
 			r.ShuffleAnswerFunc(a.Msg)
 		}
+		// Make a copy of the response before returning it. Some later
+		// elements might make changes.
 		answer = a.Copy()
 		timestamp = a.timestamp
 	}
@@ -188,9 +190,6 @@ func (r *Cache) answerFromCache(q *dns.Msg) (*dns.Msg, bool) {
 		return nil, false
 	}
 
-	// Make a copy of the response before returning it. Some later
-	// elements might make changes.
-	answer = answer.Copy()
 	answer.Id = q.Id
 
 	// Calculate the time the record spent in the cache. We need to
