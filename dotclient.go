@@ -15,6 +15,7 @@ type DoTClient struct {
 	id       string
 	endpoint string
 	pipeline *Pipeline
+	timeout  time.Duration
 	// Pipeline also provides operation metrics.
 }
 
@@ -28,6 +29,7 @@ type DoTClientOptions struct {
 	LocalAddr net.IP
 
 	TLSConfig *tls.Config
+	Timeout   time.Duration
 }
 
 var _ Resolver = &DoTClient{}
@@ -64,11 +66,12 @@ func NewDoTClient(id, endpoint string, opt DoTClientOptions) (*DoTClient, error)
 		id:       id,
 		endpoint: endpoint,
 		pipeline: NewPipeline(id, endpoint, client),
+		timeout:  opt.Timeout,
 	}, nil
 }
 
 // Resolve a DNS query.
-func (d *DoTClient) Resolve(q *dns.Msg, ci ClientInfo, timeout time.Duration) (*dns.Msg, error) {
+func (d *DoTClient) Resolve(q *dns.Msg, ci ClientInfo) (*dns.Msg, error) {
 	logger(d.id, q, ci).WithFields(logrus.Fields{
 		"resolver": d.endpoint,
 		"protocol": "dot",
@@ -76,7 +79,7 @@ func (d *DoTClient) Resolve(q *dns.Msg, ci ClientInfo, timeout time.Duration) (*
 
 	// Add padding to the query before sending over TLS
 	padQuery(q)
-	return d.pipeline.Resolve(q, timeout)
+	return d.pipeline.Resolve(q, d.timeout)
 }
 
 func (d *DoTClient) String() string {

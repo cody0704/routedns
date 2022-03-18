@@ -48,6 +48,10 @@ func NewPipeline(id string, addr string, client DNSDialer) *Pipeline {
 func (c *Pipeline) Resolve(q *dns.Msg, queryTimeout time.Duration) (*dns.Msg, error) {
 	r := newRequest(q)
 
+	if queryTimeout < defaultQueryTimeout {
+		queryTimeout = defaultQueryTimeout
+	}
+
 	timeout := time.NewTimer(queryTimeout)
 	defer timeout.Stop()
 
