@@ -11,7 +11,7 @@ import (
 )
 
 // Defines how long to wait for a response from the resolver.
-const queryTimeout = time.Second
+// const queryTimeout = time.Second
 
 // Tear down an upstream connection if nothing has been received for this long.
 const idleTimeout = 10 * time.Second
@@ -45,7 +45,7 @@ func NewPipeline(id string, addr string, client DNSDialer) *Pipeline {
 }
 
 // Resolve a single query using this connection.
-func (c *Pipeline) Resolve(q *dns.Msg) (*dns.Msg, error) {
+func (c *Pipeline) Resolve(q *dns.Msg, queryTimeout time.Duration) (*dns.Msg, error) {
 	r := newRequest(q)
 
 	timeout := time.NewTimer(queryTimeout)

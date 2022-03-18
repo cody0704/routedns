@@ -3,6 +3,7 @@ package rdns
 import (
 	"crypto/tls"
 	"net"
+	"time"
 
 	"github.com/miekg/dns"
 	"github.com/pkg/errors"
@@ -67,7 +68,7 @@ func NewDoTClient(id, endpoint string, opt DoTClientOptions) (*DoTClient, error)
 }
 
 // Resolve a DNS query.
-func (d *DoTClient) Resolve(q *dns.Msg, ci ClientInfo) (*dns.Msg, error) {
+func (d *DoTClient) Resolve(q *dns.Msg, ci ClientInfo, timeout time.Duration) (*dns.Msg, error) {
 	logger(d.id, q, ci).WithFields(logrus.Fields{
 		"resolver": d.endpoint,
 		"protocol": "dot",
@@ -75,7 +76,7 @@ func (d *DoTClient) Resolve(q *dns.Msg, ci ClientInfo) (*dns.Msg, error) {
 
 	// Add padding to the query before sending over TLS
 	padQuery(q)
-	return d.pipeline.Resolve(q)
+	return d.pipeline.Resolve(q, timeout)
 }
 
 func (d *DoTClient) String() string {
