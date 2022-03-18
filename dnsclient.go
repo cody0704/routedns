@@ -71,7 +71,7 @@ func (d *DNSClient) Resolve(q *dns.Msg, ci ClientInfo) (*dns.Msg, error) {
 
 	// Remove padding before sending over the wire in plain
 	stripPadding(q)
-	return d.pipeline.Resolve(q)
+	return d.pipeline.Resolve(q, defaultQueryTimeout)
 }
 
 func (d *DNSClient) String() string {

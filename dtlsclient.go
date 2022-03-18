@@ -99,7 +99,7 @@ func (d *DTLSClient) Resolve(q *dns.Msg, ci ClientInfo) (*dns.Msg, error) {
 
 	// Add padding to the query before sending over TLS
 	padQuery(q)
-	return d.pipeline.Resolve(q)
+	return d.pipeline.Resolve(q, defaultQueryTimeout)
 }
 
 func (d *DTLSClient) String() string {

@@ -26,14 +26,14 @@ func TestPipelineQueryTimeout(t *testing.T) {
 	q.SetQuestion("example.com.", dns.TypeA)
 
 	// Send some queries to start the pipeline
-	_, _ = p.Resolve(q)
-	_, _ = p.Resolve(q)
+	_, _ = p.Resolve(q, defaultQueryTimeout)
+	_, _ = p.Resolve(q, defaultQueryTimeout)
 
 	// Record when we sent the query in order to tell how long it took
 	start := time.Now()
-	_, err := p.Resolve(q)
+	_, err := p.Resolve(q, defaultQueryTimeout)
 
 	// Make sure we get a timeout error and it took the right amount to come back
 	require.ErrorAs(t, err, &QueryTimeoutError{})
-	require.WithinDuration(t, start.Add(queryTimeout), time.Now(), 10*time.Millisecond)
+	require.WithinDuration(t, start.Add(defaultQueryTimeout), time.Now(), 10*time.Millisecond)
 }

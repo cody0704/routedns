@@ -16,7 +16,7 @@ func Example_resolver() {
 	q.SetQuestion("google.com.", dns.TypeA)
 
 	// Resolve the query
-	a, _ := r.Resolve(q, rdns.ClientInfo{})
+	a, _ := r.Resolve(q, rdns.ClientInfo{}, defaultQueryTimeout)
 	fmt.Println(a)
 }
 
