@@ -3,6 +3,7 @@ package rdns
 import (
 	"crypto/tls"
 	"net"
+	"time"
 
 	"github.com/miekg/dns"
 	"github.com/sirupsen/logrus"
@@ -24,6 +25,8 @@ type DNSClientOptions struct {
 	// Sets the EDNS0 UDP size for all queries sent upstream. If set to 0, queries
 	// are not changed.
 	UDPSize uint16
+
+	Timeout time.Duration
 }
 
 var _ Resolver = &DNSClient{}
@@ -43,6 +46,10 @@ func NewDNSClient(id, endpoint, network string, opt DNSClientOptions) (*DNSClien
 		case "udp":
 			dialer = &net.Dialer{LocalAddr: &net.UDPAddr{IP: opt.LocalAddr}}
 		}
+	}
+
+	if opt.Timeout == 0 {
+		opt.Timeout = time.Second * 1
 	}
 
 	client := &dns.Client{
@@ -71,7 +78,7 @@ func (d *DNSClient) Resolve(q *dns.Msg, ci ClientInfo) (*dns.Msg, error) {
 
 	// Remove padding before sending over the wire in plain
 	stripPadding(q)
-	return d.pipeline.Resolve(q, defaultQueryTimeout)
+	return d.pipeline.Resolve(q, d.opt.Timeout)
 }
 
 func (d *DNSClient) String() string {

@@ -38,6 +38,10 @@ type DoHClientOptions struct {
 	LocalAddr net.IP
 
 	TLSConfig *tls.Config
+
+	TLSHandshakeTimeout   time.Duration
+	ResponseHeaderTimeout time.Duration
+	IdleConnTimeout       time.Duration
 }
 
 // DoHClient is a DNS-over-HTTP resolver with support fot HTTP/2.
@@ -57,6 +61,18 @@ func NewDoHClient(id, endpoint string, opt DoHClientOptions) (*DoHClient, error)
 	template, err := uritemplates.Parse(endpoint)
 	if err != nil {
 		return nil, err
+	}
+
+	if opt.IdleConnTimeout == 0 {
+		opt.IdleConnTimeout = 30 * time.Second
+	}
+
+	if opt.ResponseHeaderTimeout == 0 {
+		opt.ResponseHeaderTimeout = 10 * time.Second
+	}
+
+	if opt.TLSHandshakeTimeout == 0 {
+		opt.TLSHandshakeTimeout = 5 * time.Second
 	}
 
 	var tr http.RoundTripper
@@ -206,8 +222,9 @@ func dohTcpTransport(opt DoHClientOptions) (http.RoundTripper, error) {
 		Proxy:                 http.ProxyFromEnvironment,
 		TLSClientConfig:       opt.TLSConfig,
 		DisableCompression:    true,
-		ResponseHeaderTimeout: 10 * time.Second,
-		IdleConnTimeout:       30 * time.Second,
+		TLSHandshakeTimeout:   opt.TLSHandshakeTimeout,
+		ResponseHeaderTimeout: opt.ResponseHeaderTimeout,
+		IdleConnTimeout:       opt.IdleConnTimeout,
 	}
 	// If we're using a custom tls.Config, HTTP2 isn't enabled by default in
 	// the HTTP library. Turn it on for this transport.

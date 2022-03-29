@@ -62,6 +62,11 @@ func NewDoTClient(id, endpoint string, opt DoTClientOptions) (*DoTClient, error)
 		client.TLSConfig.ServerName = host
 		endpoint = net.JoinHostPort(opt.BootstrapAddr, port)
 	}
+
+	if opt.Timeout == 0 {
+		opt.Timeout = time.Second * 1
+	}
+
 	return &DoTClient{
 		id:       id,
 		endpoint: endpoint,
